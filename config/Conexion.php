@@ -8,10 +8,8 @@ Class Conexion{
 		$usuario  = "root";
 		$clave    = "";
 		$base	  = "";
-		$this->conexion = mysql_connect($servidor, $usuario, $clave)
-			or die('No se pudo conectar: ' . mysql_error());
-		mysql_set_charset('utf8', $this->conexion);
-		mysql_select_db($base, $this->conexion) or die('No se pudo seleccionar la base de datos');
+		$this->conexion = mysqli_connect($servidor, $usuario, $clave, $base)
+			or die('No se pudo conectar: ' . mysqli_connect_error());
 	}
 
 	public function __destruct(){
@@ -19,23 +17,23 @@ Class Conexion{
 	}
 
 	public function consulta($sql){
-		$resultado = mysql_query($sql) or die('Consulta fallida: ' . mysql_error());
+		$resultado = mysqli_query($this->conexion, $sql) or die('Consulta fallida: ' . mysqli_connect_error());
 		$datos = "";
 
 		//Verificamos que sea un select para recorrer, si es insert o update no hace nada
 		$pos = strpos($sql, "ELECT");
 		if($pos){
-			while($fila =  mysql_fetch_array($resultado, MYSQL_ASSOC)){
+			while($fila =  mysqli_fetch_array($resultado, MYSQLI_ASSOC)){
 				$datos[] = $fila;
 			} 
 			// Liberar resultados
-			mysql_free_result($resultado);   	
+			mysqli_free_result($resultado);   	
 		}
 		return $datos;
 	}
 
 	public function cerrarConexion(){
-		mysql_close($this->conexion);
+		mysqli_close($this->conexion);
 	}
 
 }
